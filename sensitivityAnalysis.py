@@ -15,10 +15,10 @@ maxTotalNstage = 30
 minTotalNstage = 8
 refluxRatioVector = np.array([0.5, 1, 2, 5, 10])
 
-def feedStageV(currentTotalNstage):
+def feedStageV(currentNstage):
     
-    middleStage = round(currentTotalNstage/2)
-    feedStageVector = np.array([middleStage])
+    middleStage = round(currentNstage/2)
+    feedStageVec = np.array([middleStage])
 
     indexWhileFeedStage = 1
     upValue = middleStage + 2
@@ -30,38 +30,37 @@ def feedStageV(currentTotalNstage):
             pass
         else:
             lowValueArray = np.array([lowValue])
-            feedStageVector = np.append(feedStageVector,lowValueArray)
+            feedStageVec = np.append(feedStageVec,lowValueArray)
         
-        if upValue >= currentTotalNstage:
+        if upValue >= currentNstage:
             pass
         else:
             upValueArray = np.array([upValue])
-            feedStageVector = np.append(feedStageVector,upValueArray)
+            feedStageVec = np.append(feedStageVec,upValueArray)
 
         indexWhileFeedStage = indexWhileFeedStage + 1
         lowValue = lowValue - 2
         upValue = upValue + 2
     
-    feedStageVector = np.sort(feedStageVector)
+    feedStageVec = np.sort(feedStageVec)
     
-    return feedStageVector
+    return feedStageVec
 
-
-def functionAspen(minTotalNstage):
+def functionAspen(TotalNstage):
     vectorOutput = np.zeros([5])
     vectorInput = np.zeros([])#Fijar número más adelante
-    aspen.Reinit()
 
     while indexWhile < 30:
-        currentTotalNstage = minTotalNstage
-        Application.Tree.FindNode("\Data\Blocks\CR\Input\NSTAGE").Value = currentTotalNstage
-        Application.Tree.FindNode("\Data\Blocks\CR\Input\FEED_STAGE\OXY").Value = currentTotalNstage - 1
-        feedStageVector = feedStageV
+        currentNstage = TotalNstage
+        feedStageVector = feedStageV(currentNstage)
         
         for indexRefluxRatio in range(refluxRatioVector):
-            Application.Tree.FindNode("\Data\Blocks\CR\Input\BASIS_RR").Value = refluxRatioVector[indexRefluxRatio]
+            for indexFeedStage in range(feedStageVector):
+
+
+
             
 
-        Application.Tree.FindNode("\Data\Blocks\CR\Input\REAC_STAGE2\#0").Value = currentTotalNstage - 1
+        Application.Tree.FindNode("\Data\Blocks\CR\Input\REAC_STAGE2\#0").Value = currentNstage - 1
         
         indexWhile = indexWhile + 3

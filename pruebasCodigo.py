@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 
 def feedStageV(currentTotalNstage):
@@ -33,3 +34,4 @@ def feedStageV(currentTotalNstage):
 
 a = feedStageV(30)
 print(a)
+# %%
