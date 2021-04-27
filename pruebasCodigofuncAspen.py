@@ -8,5 +8,4 @@ def funcAspen(currentNstage, refluxRatioVector[indexRefluxRatio], feedStageVecto
     Application.Tree.FindNode("\Data\Blocks\CR\Input\BASIS_RR").Value = refluxRatioVector
     #Numeber of feed stage of glycerin
     Application.Tree.FindNode("\Data\Blocks\CR\Input\FEED_STAGE\FEED").Value = feedStageVector
-
     
