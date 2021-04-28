@@ -38,5 +38,7 @@ def reactiveStageBoundary(currentNstage):
     lb = [2, middleStage + 1]
     return lb, ub
 
-print(reactiveStageBoundary(30))
+refluxRatioVector = np.array([0.5, 1, 2, 5, 10])
+for indexRefluxRatio in range(len(refluxRatioVector)):
+    print(refluxRatioVector[indexRefluxRatio])
 # %%
