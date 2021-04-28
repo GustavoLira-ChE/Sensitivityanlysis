@@ -46,6 +46,13 @@ def feedStageV(currentNstage):
     
     return feedStageVec
 
+def reactiveStageBoundary(currentNstage):
+    middleStage = round(currentNstage/2)
+    ub = [middleStage, currentNstage -1]
+    lb = [2, middleStage + 1]
+    return lb, ub
+
+
 def functionAspen(TotalNstage):
     vectorOutput = np.zeros([5])
     vectorInput = np.zeros([])#Fijar número más adelante

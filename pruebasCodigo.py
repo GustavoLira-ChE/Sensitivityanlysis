@@ -27,11 +27,16 @@ def feedStageV(currentTotalNstage):
         indexWhileFeedStage = indexWhileFeedStage + 1
         lowValue = lowValue - 2
         upValue = upValue + 2
-    
+    print(feedStageVector)
     feedStageVector = np.sort(feedStageVector)
     
     return feedStageVector
 
-a = feedStageV(30)
-print(a)
+def reactiveStageBoundary(currentNstage):
+    middleStage = round(currentNstage/2)
+    ub = [middleStage, currentNstage -1]
+    lb = [2, middleStage + 1]
+    return lb, ub
+
+print(reactiveStageBoundary(30))
 # %%
