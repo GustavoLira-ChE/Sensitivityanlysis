@@ -5,10 +5,11 @@ import os
 import numpy as np
 import win32com.client as win32
 import matplotlib.pyplot as plt
+import pyswarm as pso
 
 #Vincular ASPEN V11.0
 aspen = win32.Dispatch('Apwn.Document')
-aspen.InitFromArchive2(os.path.abspath('C:\ReacDes.bkp')) #Modificar la ruta del archivo
+aspen.InitFromArchive2(os.path.abspath('C:\SimulationCR-C1.apwz')) #Modificar la ruta del archivo
 
 #Valores máximos para Ns, 
 maxTotalNstage = 30
@@ -52,22 +53,48 @@ def reactiveStageBoundary(currentNstage):
     lb = [2, middleStage + 1]
     return lb, ub
 
+def funcAspen(x, *agrs):
 
-def functionAspen(TotalNstage):
-    vectorOutput = np.zeros([5])
-    vectorInput = np.zeros([])#Fijar número más adelante
+    currentNstage, refluxRatioVector[indexRefluxRatio], feedStageVector[indexFeedStage] = args
+    reactiveStage1, reactiveStage2 = x
 
-    while indexWhile < 30:
-        currentNstage = TotalNstage
+    #Star ASPEN simulation
+    aspen.Reinit()
+
+    #Args value
+    #Number of stage in column
+    aspen.Tree.FindNode("\Data\Blocks\CR\Input\NSTAGE").Value = currentNstage
+    #Number of feed stage of oxygen 
+    aspen.Tree.FindNode("\Data\Blocks\CR\Input\FEED_STAGE\OXY").Value = currentNstage - 1
+    #Number of reflux ratio
+    aspen.Tree.FindNode("\Data\Blocks\CR\Input\BASIS_RR").Value = refluxRatioVector
+    #Numeber of feed stage of glycerin
+    aspen.Tree.FindNode("\Data\Blocks\CR\Input\FEED_STAGE\FEED").Value = feedStageVector
+
+    #Variable value
+    aspen.Tree.FindNode("\Data\Blocks\CR\Input\REAC_STAGE1\#0").Value = reactiveStage1
+    aspen.Tree.FindNode("\Data\Blocks\CR\Input\REAC_STAGE2\#0").Value = reactiveStage2
+
+    #Run simulation
+    aspen.Engine.Run2()
+
+    reboilerHeatDuty = aspen.Tree.FindNode("\Data\Blocks\CR\Output\REB_DUTY").Value
+    aspen.Close()
+
+    return reboilerHeatDuty
+
+def functionAspen(minTotalNstage):
+    #vectorOutput = np.zeros([5])
+    #vectorInput = np.zeros([])#Fijar número más adelante
+
+    while minTotalNstage < maxTotalNstage:
+        currentNstage = minTotalNstage
         feedStageVector = feedStageV(currentNstage)
-        
+        lbyub = reactiveStageBoundary(currentNstage)
+        lb = lbyub[0]
+        up = lbyub[1]
         for indexRefluxRatio in range(refluxRatioVector):
             for indexFeedStage in range(feedStageVector):
+                xopt, fopt = pso(funcAspen, lb, ub,args=args)
 
-
-
-            
-
-        Application.Tree.FindNode("\Data\Blocks\CR\Input\REAC_STAGE2\#0").Value = currentNstage - 1
-        
-        indexWhile = indexWhile + 3
+        minTotalNstage = minTotalNstage + 3
