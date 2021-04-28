@@ -7,15 +7,6 @@ import win32com.client as win32
 import matplotlib.pyplot as plt
 import pyswarm as pso
 
-#Vincular ASPEN V11.0
-aspen = win32.Dispatch('Apwn.Document')
-aspen.InitFromArchive2(os.path.abspath('C:\SimulationCR-C1.apwz')) #Modificar la ruta del archivo
-
-#Valores máximos para Ns, 
-maxTotalNstage = 30
-minTotalNstage = 8
-refluxRatioVector = np.array([0.5, 1, 2, 5, 10])
-
 def feedStageV(currentNstage):
     
     middleStage = round(currentNstage/2)
@@ -63,25 +54,34 @@ def funcAspen(x, *agrs):
 
     #Args value
     #Number of stage in column
-    aspen.Tree.FindNode("\Data\Blocks\CR\Input\NSTAGE").Value = currentNstage
+    #aspen.Tree.FindNode('\Data\Blocks\CR\Input\NSTAGE').Value = currentNstage
     #Number of feed stage of oxygen 
-    aspen.Tree.FindNode("\Data\Blocks\CR\Input\FEED_STAGE\OXY").Value = currentNstage - 1
+    aspen.Tree.FindNode('\Data\Blocks\CR\Input\FEED_STAGE\OXY').Value = currentNstage - 1
     #Number of reflux ratio
-    aspen.Tree.FindNode("\Data\Blocks\CR\Input\BASIS_RR").Value = refluxRatioVector
+    aspen.Tree.FindNode('\Data\Blocks\CR\Input\BASIS_RR').Value = refluxRatioVector
     #Numeber of feed stage of glycerin
-    aspen.Tree.FindNode("\Data\Blocks\CR\Input\FEED_STAGE\FEED").Value = feedStageVector
+    aspen.Tree.FindNode('\Data\Blocks\CR\Input\FEED_STAGE\FEED').Value = feedStageVector
 
     #Variable value
-    aspen.Tree.FindNode("\Data\Blocks\CR\Input\REAC_STAGE1\#0").Value = reactiveStage1
-    aspen.Tree.FindNode("\Data\Blocks\CR\Input\REAC_STAGE2\#0").Value = reactiveStage2
+    aspen.Tree.FindNode('\Data\Blocks\CR\Input\REAC_STAGE1\#0').Value = reactiveStage1
+    aspen.Tree.FindNode('\Data\Blocks\CR\Input\REAC_STAGE2\#0').Value = reactiveStage2
 
     #Run simulation
     aspen.Engine.Run2()
 
-    reboilerHeatDuty = aspen.Tree.FindNode("\Data\Blocks\CR\Output\REB_DUTY").Value
+    reboilerHeatDuty = aspen.Tree.FindNode('\Data\Blocks\CR\Output\REB_DUTY').Value
     aspen.Close()
 
     return reboilerHeatDuty
+
+#Vincular ASPEN V11.0
+aspen = win32.Dispatch('Apwn.Document')
+aspen.InitFromArchive2(os.path.abspath('C:\SimulationCR-C1.bkp')) #Modificar la ruta del archivo
+
+#Valores máximos para Ns
+maxTotalNstage = 30
+minTotalNstage = 8
+refluxRatioVector = np.array([0.5, 1, 2, 5, 10])
 
 def functionAspen(minTotalNstage):
     #vectorOutput = np.zeros([5])
@@ -93,8 +93,11 @@ def functionAspen(minTotalNstage):
         lbyub = reactiveStageBoundary(currentNstage)
         lb = lbyub[0]
         up = lbyub[1]
-        for indexRefluxRatio in range(refluxRatioVector):
-            for indexFeedStage in range(feedStageVector):
+        for indexRefluxRatio in range(len(refluxRatioVector)):
+            for indexFeedStage in range(len(feedStageVector)):
+                args = [currentNstage, refluxRatioVector[indexRefluxRatio], feedStageVector[indexFeedStage]]
                 xopt, fopt = pso(funcAspen, lb, ub,args=args)
 
         minTotalNstage = minTotalNstage + 3
+
+correr = functionAspen(minTotalNstage)
