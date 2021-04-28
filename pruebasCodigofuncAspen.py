@@ -1,4 +1,7 @@
-def funcAspen(currentNstage, refluxRatioVector[indexRefluxRatio], feedStageVector[indexFeedStage]:
+def funcAspen(x, *agrs):
+    currentNstage, refluxRatioVector[indexRefluxRatio], feedStageVector[indexFeedStage] = args
+    
+    
     aspen.Reinit()
     #Number of stage in column
     Application.Tree.FindNode("\Data\Blocks\CR\Input\NSTAGE").Value = currentNstage
