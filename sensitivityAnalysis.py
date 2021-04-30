@@ -1,3 +1,4 @@
+#%%
 import random
 import numpy as np
 import math
@@ -58,9 +59,9 @@ def funcAspen(x, *agrs):
     #Number of feed stage of oxygen 
     aspen.Tree.FindNode('\Data\Blocks\CR\Input\FEED_STAGE\OXY').Value = currentNstage - 1
     #Number of reflux ratio
-    aspen.Tree.FindNode('\Data\Blocks\CR\Input\BASIS_RR').Value = refluxRatioVector
+    aspen.Tree.FindNode('\Data\Blocks\CR\Input\BASIS_RR').Value = refluxRatioVector[indexRefluxRatio]
     #Numeber of feed stage of glycerin
-    aspen.Tree.FindNode('\Data\Blocks\CR\Input\FEED_STAGE\FEED').Value = feedStageVector
+    aspen.Tree.FindNode('\Data\Blocks\CR\Input\FEED_STAGE\FEED').Value = feedStageVector[indexFeedStage]
 
     #Variable value
     aspen.Tree.FindNode('\Data\Blocks\CR\Input\REAC_STAGE1\#0').Value = reactiveStage1
@@ -92,12 +93,15 @@ def functionAspen(minTotalNstage):
         feedStageVector = feedStageV(currentNstage)
         lbyub = reactiveStageBoundary(currentNstage)
         lb = lbyub[0]
-        up = lbyub[1]
+        ub = lbyub[1]
         for indexRefluxRatio in range(len(refluxRatioVector)):
             for indexFeedStage in range(len(feedStageVector)):
                 args = [currentNstage, refluxRatioVector[indexRefluxRatio], feedStageVector[indexFeedStage]]
                 xopt, fopt = pso(funcAspen, lb, ub,args=args)
 
         minTotalNstage = minTotalNstage + 3
+    
+    return xopt, fopt
 
 correr = functionAspen(minTotalNstage)
+# %%
